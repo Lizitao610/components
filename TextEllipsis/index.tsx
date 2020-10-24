@@ -3,10 +3,13 @@ import React, { useRef, useState, useEffect } from 'react';
 interface IProp {
   value: string;
 }
-
+/**
+ * 多行文本溢出显示省略号组件
+ */
 const TextEllipsis = ({ value }: IProp) => {
   const parentEle = useRef<HTMLDivElement>(null);
   const [text, setText] = useState(value);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const adjustValue = (text: string) => {
@@ -18,6 +21,8 @@ const TextEllipsis = ({ value }: IProp) => {
         setTimeout(() => {
           adjustValue(textSlice);
         }, 0);
+      } else {
+        setVisible(true);
       }
     };
 
@@ -29,6 +34,7 @@ const TextEllipsis = ({ value }: IProp) => {
     overflow: 'auto',
     display: 'flex',
     alignItems: 'center',
+    visibility: visible ? '' : 'hidden',
   };
 
   const isExceed = value.length > text.length;
