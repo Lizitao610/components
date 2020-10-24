@@ -11,22 +11,45 @@ const TextEllipsis = ({ value, style:customStyle }: IProp) => {
   const [text, setText] = useState(value);
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
-    const adjustValue = (text: string) => {
-      const { clientHeight, scrollHeight } = (parentEle.current || {}) as HTMLDivElement;
+  const delay = () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve()
+      }, 0)
+    })
+  }
 
-      if (clientHeight < scrollHeight) {
-        const textSlice = text.slice(0, text.length - 1);
-        setText(textSlice);
-        setTimeout(() => {
-          adjustValue(textSlice);
-        }, 0);
-      } else {
-        setVisible(true);
+  const getHeightInfo = () => {
+    const { clientHeight, scrollHeight } = (parentEle.current || {}) as HTMLDivElement;
+    return { clientHeight, scrollHeight }
+  }
+
+  useEffect(() => {
+    const adjustValue = async () => {
+      if (text.length === 0) return
+      const { clientHeight, scrollHeight } = getHeightInfo()
+      if (clientHeight >= scrollHeight) {
+        setVisible(true)
+        return
       }
+      let start = 0
+      let end = text.length - 1
+      while (start <= end) {
+        const mid = Math.floor((start + end) / 2)
+        const textSlice = text.slice(0, mid);
+        setText(textSlice);
+        await delay()  // 等待渲染完成再判断
+        const { clientHeight, scrollHeight } = getHeightInfo()
+        if (clientHeight < scrollHeight) {
+          end = mid - 1
+        } else {
+          start = mid + 1
+        }
+      }
+      setVisible(true)
     };
 
-    adjustValue(text);
+    adjustValue();
   }, [value]);
 
   const Style: any = {
