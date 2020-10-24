@@ -1,12 +1,12 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, HTMLProps } from 'react';
 
-interface IProp {
+interface IProp extends HTMLProps<HTMLDivElement>{
   value: string;
 }
 /**
  * 多行文本溢出显示省略号组件
  */
-const TextEllipsis = ({ value }: IProp) => {
+const TextEllipsis = ({ value, style:customStyle }: IProp) => {
   const parentEle = useRef<HTMLDivElement>(null);
   const [text, setText] = useState(value);
   const [visible, setVisible] = useState(false);
@@ -34,6 +34,7 @@ const TextEllipsis = ({ value }: IProp) => {
     overflow: 'auto',
     display: 'flex',
     alignItems: 'center',
+    ...customStyle,
     visibility: visible ? '' : 'hidden',
   };
 
